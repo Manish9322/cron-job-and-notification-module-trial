@@ -4,18 +4,31 @@ import { insertRandomString } from "@/lib/cron/jobs/randomStringInsertJob";
 export const runtime = "nodejs";
 
 function isAuthorized(request) {
+  const authHeader = request.headers.get("authorization") || "";
   const configuredSecret = process.env.CRON_SECRET;
 
   if (!configuredSecret) {
-    return process.env.NODE_ENV !== "production";
+    return true;
   }
 
-  const authHeader = request.headers.get("authorization") || "";
-  return authHeader === `Bearer ${configuredSecret}`;
+  if (authHeader === `Bearer ${configuredSecret}`) {
+    return true;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    return true;
+  }
+
+  return false;
 }
 
 export async function GET(request) {
+  console.log(
+    `[CRON:random-string-insert] Received cron trigger at ${new Date().toISOString()}`
+  );
+
   if (!isAuthorized(request)) {
+    console.warn(`[CRON:random-string-insert] Unauthorized attempt`);
     return NextResponse.json(
       { success: false, message: "Unauthorized cron trigger" },
       { status: 401 }
