@@ -34,3 +34,22 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Cron Setup (Vercel / Serverless)
+
+This project now uses a serverless-safe scheduled trigger route:
+
+- `GET /api/cron/random-string`
+- Vercel schedule is defined in `vercel.json` as `0 0 * * *` (midnight UTC).
+
+### Required Environment Variables
+
+- `CRON_SECRET`: shared secret used to authorize scheduled requests.
+- `CRON_ENABLED`: set to `false` only if you want to disable in-process cron in always-on environments.
+- `RANDOM_STRING_CRON_SCHEDULE`: optional schedule for in-process cron (default: `0 0 * * *`).
+- `RANDOM_STRING_CRON_TIMEZONE`: optional timezone for in-process cron (default: `UTC`).
+
+### Important
+
+- Do not rely on `node-cron` in API route module scope for serverless runtimes.
+- On Vercel, use `vercel.json` crons to call the protected route.

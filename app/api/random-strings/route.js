@@ -1,14 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import RandomString from "@/models/RandomString";
-import {
-  initRandomStringCronJob,
-  insertRandomString,
-} from "@/lib/cron/jobs/randomStringInsertJob";
+import { insertRandomString } from "@/lib/cron/jobs/randomStringInsertJob";
 
 export const runtime = "nodejs";
-
-initRandomStringCronJob();
 
 export async function GET() {
   try {

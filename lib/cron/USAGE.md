@@ -12,8 +12,14 @@ This folder is intentionally modular so you can copy it into another project.
 
 1. Copy `lib/cron/registry.js` and `lib/cron/createCronJob.js`.
 2. Create your own file under `lib/cron/jobs/`.
-3. Use `registerCronJob({ name, schedule, task })`.
-4. Call your init function once in route/module scope.
+3. Use `registerCronJob({ name, schedule, task, timezone })`.
+4. In always-on servers, call your init function once during server startup.
+
+## Important Runtime Note
+
+- Do not rely on in-process `node-cron` on serverless platforms like Vercel.
+- In serverless deployments, use platform/external cron to call a protected API route.
+- Keep cron schedule timezone explicit (for example `UTC`) to avoid ambiguity.
 
 ## Example
 
@@ -24,6 +30,7 @@ export function initCleanupCronJob() {
   return registerCronJob({
     name: "daily-cleanup",
     schedule: "0 2 * * *",
+    timezone: "UTC",
     task: async () => {
       // your cleanup logic
     },
